@@ -22,18 +22,15 @@ app.use(express.static("public"));
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoScraper";
 mongoose.connect(MONGODB_URI);
 
-// app.get("/scrape", function(req, res) {
+app.get("/scrape", function(req, res) {
+  console.log("yes, I'm here")
   axios.get("https://www.buzzfeednews.com/").then(function(response) {
     var $ = cheerio.load(response.data);
    
-    // Now, we grab every h2 within an article tag, and do the following:
     $("article.newsblock-story-card").each(function(i, element) {
-      // Save an empty result object
       var result = {};
     
-
-      // Add the text and href of every link, and save them as properties of the result object
-      result.title = $(this)
+      result.headline = $(this)
         .children("span").children("h2")
         .text().trim();
       result.url = $(this)
@@ -42,18 +39,29 @@ mongoose.connect(MONGODB_URI);
       result.summary = $(this)
         .children("span").children("p")
         .text();
+      result.saved = false;
 
-      // db.Article.create(result)
-      //   .then(function(dbArticle) {
-      //     console.log(dbArticle);
-      //   })
-      //   .catch(function(err) {
-      //     console.log(err);
-      //   });
-      console.log(result)
+      db.Article.create(result)
+        .then(function(dbArticle) {
+          console.log(dbArticle);
+        })
+        .catch(function(err) {
+          console.log(err);
+        });
+      console.log("HEY", result)
     });
   });
-// });
+});
+
+app.get("/articles", function(req, res) {
+  db.Article.find({})
+    .then(function(dbArticle) {
+      res.json(dbArticle);
+    })
+    .catch(function(err) {
+      res.json(err);
+    });
+});
 
 
 
