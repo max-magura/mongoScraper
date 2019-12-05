@@ -22,7 +22,7 @@ app.use(express.static("public"));
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoScraper";
 mongoose.connect(MONGODB_URI);
 
-app.get("/scrape", function(req, res) {
+app.get("/articles", function(req, res) {
   console.log("yes, I'm here")
   axios.get("https://www.buzzfeednews.com/").then(function(response) {
     var $ = cheerio.load(response.data);
@@ -43,26 +43,34 @@ app.get("/scrape", function(req, res) {
 
       db.Article.create(result)
         .then(function(dbArticle) {
-          console.log(dbArticle);
         })
         .catch(function(err) {
           console.log(err);
         });
-      console.log("HEY", result)
+
+      db.Article.aggregate([{ $sample: { size: 10 } }])
+        .then(function(dbArticle) {
+          res.json(dbArticle);
+        })
+        .catch(function(err) {
+          res.json(err);
+        });
+  
     });
   });
 });
 
-app.get("/articles", function(req, res) {
-  db.Article.find({})
-    .then(function(dbArticle) {
-      res.json(dbArticle);
-    })
-    .catch(function(err) {
-      res.json(err);
-    });
-});
+// app.get("/articles", function(req, res) {
+//   db.Article.aggregate([{ $sample: { size: 10 } }])
+//     .then(function(dbArticle) {
+//       res.json(dbArticle);
+//     })
+//     .catch(function(err) {
+//       res.json(err);
+//     });
+// });
 
+// db.mycoll.aggregate([{ $sample: { size: 1 } }])
 
 
 // STUFF HERE //
