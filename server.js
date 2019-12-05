@@ -15,6 +15,11 @@ app.get('/', function (req, res) {
     res.render('home');
 });
 
+app.get("/savedArticles", function (req, res) {
+  console.log("CLIIIICK")
+  res.render("savedArticles");
+});
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
@@ -58,25 +63,21 @@ app.get("/articles", function(req, res) {
   
     });
   });
+
 });
 
-// app.get("/articles", function(req, res) {
-//   db.Article.aggregate([{ $sample: { size: 10 } }])
-//     .then(function(dbArticle) {
-//       res.json(dbArticle);
-//     })
-//     .catch(function(err) {
-//       res.json(err);
-//     });
-// });
-
-// db.mycoll.aggregate([{ $sample: { size: 1 } }])
-
-
-// STUFF HERE //
-
-
-
+app.put("/articles/:id", function(req, res) {
+  db.Article.findAndModify({
+    query: { _id: req.params.id },
+    update: {$set: {"saved": true}}
+  })
+    .then(function(dbArticle) {
+      res.json(dbArticle);
+    })
+    .catch(function(err) {
+      res.json(err);
+    });
+});
 
 app.listen(PORT, function() {
   console.log("App running on port " + PORT + "!");
