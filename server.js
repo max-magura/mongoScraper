@@ -5,7 +5,7 @@ var cheerio = require("cheerio");
 var axios = require("axios");
 
 var db = require("./models");
-var PORT = 8081;
+var PORT = process.env.YOUR_PORT || 8081;
 var app = express();
  
 app.engine('handlebars', exphbs());
