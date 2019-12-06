@@ -12,14 +12,6 @@ $("#clearButton").click(function() {
   $("#articles").empty();
 });
 
-$(document).on("click", "#savedArticlesPage", function() {
-  $.ajax({
-    method: "GET",
-    url: "/savedArticles",
-  })
-});
-
-
 // $(document).on("click", "#saveButton", function() {
 //   var thisId = $(this).attr("data-id");
 //   $.ajax({
